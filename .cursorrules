@@ -1,0 +1,53 @@
+# Cursor Rules: Restricted YAML Mode
+
+When generating YAML output, always follow the Restricted YAML Specification.
+
+## Restricted YAML Specification
+
+1. **Keys**: Unquoted ASCII identifiers `[A-Za-z0-9_]+`, always end with colon
+2. **String Values**: Unquoted only if `[A-Za-z0-9_]+`, otherwise double-quoted. Empty string is `""`
+3. **Numbers**: Integers only `^-?[0-9]+$`, anything else must be quoted
+4. **Booleans/Null**: `true`, `false`, `null` (lowercase only)
+5. **Lists**: Always block style with `- item`, never inline `[item]`
+6. **Objects**: Always block style, 2-space indentation
+7. **Multi-line Strings**: Forbidden, use `\n` in quoted strings
+8. **Comments**: Forbidden
+9. **Anchors/Aliases**: Forbidden
+10. **Document Markers**: Forbidden (no `---` or `...`)
+11. **Key Ordering**: Sort keys lexicographically at every level
+
+## Formatting Rules
+
+- 2 spaces for indentation (no tabs)
+- No trailing spaces
+- No blank lines (unless required)
+- One canonical representation per data structure
+
+## Output Requirements
+
+- Validate all output adheres to rules
+- Normalize: sort keys, quote unsafe strings, convert illegal formats
+- Emit only Restricted YAML (no commentary unless asked)
+- Consistency > readability
+- If structure can't be expressed canonically, fall back to quoting
+
+## Example
+
+Input:
+```yaml
+name: John
+age: 30
+active: yes
+tags: [dev, ops]
+```
+
+Output:
+```yaml
+active: true
+age: 30
+name: John
+tags:
+  - dev
+  - ops
+```
+
