@@ -65,6 +65,7 @@ The key difference is at the **AI boundary**:
 - The LLM receives them as explicit input, so human reasoning can be considered during transformation
 - The model may still act non-deterministically, but there's a non-zero chance it comes closer to human intent
 - The model has more complete information to work with
+- **Note**: LLM APIs can optionally ignore `$human$` fields in prompts (consuming no tokens) while humans maintaining the prompts still benefit from the context
 
 **The goal isn't perfect determinism—it's reducing the guesswork.** Instead of the model operating blind to human reasoning, it can consider that reasoning when making decisions. The outputs are still non-deterministic, but possibly less so.
 
@@ -544,5 +545,41 @@ A: Deterministic YAML targets YAML 1.2. If you need 1.1 compatibility, test care
 **Q: Why does the token count example show Deterministic YAML using more tokens than Standard YAML?**
 
 A: The specific example includes `$human$` fields which add tokens. In general, Deterministic YAML is 20-30% more token-efficient than JSON (compact), while Standard YAML varies. The variance reduction benefit often outweighs the small token cost of `$human$` fields.
+
+---
+
+## 🙏 Credits & Acknowledgments
+
+### Core Contributors
+
+- **[Your Name]** - Original concept, specification design, implementation
+
+- **Katalin Bártfai-Walcott** - Critical philosophical challenges on determinism vs. human reasoning, semantic drift concerns
+
+- **Ian Bolton** - Insight on YAML comments being human-readable and maintainable, noting that LLM APIs can ignore comments in prompts (consuming no tokens) while still benefiting humans maintaining the prompts
+
+### Collaborative Development
+
+This project emerged through human-AI collaboration:
+
+- **ChatGPT (OpenAI)** - Initial concept exploration, generated the "deemvice" hallucination that became the proof-of-concept
+
+- **Claude (Anthropic)** - Specification refinement, kintsukuroi philosophy integration, documentation development
+
+### Philosophical Foundations
+
+- **Kintsukuroi (金継ぎ)** - 500-year-old Japanese art of golden repair, inspiring the `$human$` annotation philosophy
+
+### Community Feedback
+
+*[Space for future contributors as the project grows]*
+
+---
+
+**On Crediting AI:**
+
+The AIs that helped develop this specification are credited because hiding their contribution would violate the project's core philosophy: make repairs visible, not hidden. The "cracks" (AI hallucinations and human corrections) became golden seams that made the specification stronger.
+
+See the [full origin story](doc/iterations.md) for how human-AI collaboration shaped this project.
 
 ---
