@@ -56,4 +56,110 @@ JSON solves some of these issues but wastes tokens and is less human-friendly.
 - **Canonicalizer** to normalize arbitrary YAML  
 - **Examples & tests** demonstrating deterministic output
 
+### Tool Output Examples
+
+#### Variance Comparison (`compare_restricted_yaml.py`)
+
+```
+VARIANCE ANALYSIS
+================
+
+JSON:
+  Unique outputs: 2/30
+  Uniqueness ratio: 6.67%
+  Structural variance: 3.33%
+
+Standard YAML:
+  Unique outputs: 5/30
+  Uniqueness ratio: 16.67%
+  Structural variance: 10.00%
+
+Restricted YAML:
+  Unique outputs: 3/30
+  Uniqueness ratio: 10.00%
+  Structural variance: 3.33%
+
+Variance reduction (Restricted vs Standard YAML): 40.0%
+
+TOKEN COUNT COMPARISON
+======================
+
+JSON (pretty):         40 tokens
+JSON (compact):        31 tokens
+Standard YAML:         25 tokens
+Restricted YAML:       26 tokens
+
+Token savings vs JSON (compact):
+  Standard YAML:      19.4%
+  Restricted YAML:    16.1%
+```
+
+#### Token Count Analysis (`token_count_analysis.py`)
+
+```
+TOKEN COUNT ANALYSIS: JSON vs YAML
+===================================
+
+Test Case 1:
+  JSON (pretty):   13 tokens
+  JSON (compact):  11 tokens
+  YAML (block):      8 tokens
+  → JSON uses +5 tokens (+38.5%) more than YAML
+
+EFFICIENCY ANALYSIS (Averages)
+===============================
+
+Average token counts across 4 test cases:
+  JSON (pretty):  36.5 tokens
+  JSON (compact): 26.8 tokens
+  YAML (block):   23.5 tokens
+
+Ratios:
+  YAML block vs JSON compact: 0.88x
+  JSON compact vs YAML block: 1.14x
+```
+
+#### YAML Compatibility Test (`test_yaml_compatibility.py`)
+
+```
+YAML COMPATIBILITY TEST
+=======================
+
+Test 1: Simple mapping
+  Restricted YAML:
+  active: true
+  age: 30
+  name: John
+  ✓ Parsed by PyYAML: {'active': True, 'age': 30, 'name': 'John'}
+  ✓ Data matches original
+  ✓ Parsed by custom parser: matches
+
+Test 2: Nested mapping
+  Restricted YAML:
+  config:
+    host: localhost
+    port: 5432
+  ✓ Parsed by PyYAML: {'config': {'host': 'localhost', 'port': 5432}}
+  ✓ Data matches original
+```
+
+#### Variance Demo (`demo_without_api.py`)
+
+```
+VARIANCE ANALYSIS
+=================
+
+JSON Results:
+  Unique outputs: 2/20
+  Uniqueness ratio: 10.00%
+  Structural variance: 5.00%
+
+YAML Results:
+  Unique outputs: 6/20
+  Uniqueness ratio: 30.00%
+  Structural variance: 20.00%
+
+  YAML variance is 3.00x higher than JSON
+```
+
 ---
