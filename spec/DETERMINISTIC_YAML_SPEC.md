@@ -1,10 +1,10 @@
-# Restricted YAML Specification
+# Deterministic YAML Specification
 
 A subset of YAML designed to reduce variance while maintaining token efficiency.
 
 ## Key Principle
 
-**Restricted YAML is valid YAML** - any standard YAML parser (PyYAML, yaml-cpp, etc.) can parse it correctly. We don't introduce new syntax; we simply restrict which YAML features are allowed.
+**Deterministic YAML is valid YAML** - any standard YAML parser (PyYAML, yaml-cpp, etc.) can parse it correctly. We don't introduce new syntax; we simply restrict which YAML features are allowed.
 
 ## Goals
 
@@ -149,11 +149,11 @@ config: {}
 
 ### 10. Comments - Explicitly Forbidden
 
-**Formal Rule: Comments are strictly forbidden in Restricted YAML.**
+**Formal Rule: Comments are strictly forbidden in Deterministic YAML.**
 
 #### Prohibition
 
-- **YAML comment syntax (`#`) is not allowed anywhere in Restricted YAML**
+- **YAML comment syntax (`#`) is not allowed anywhere in Deterministic YAML**
 - This includes:
   - Line comments: `# This is a comment`
   - Inline comments: `key: value  # comment`
@@ -278,7 +278,7 @@ age: 30
 
 **Result**: 5+ different valid representations of the same data.
 
-### Restricted YAML (Low Variance)
+### Deterministic YAML (Low Variance)
 
 The same data has only one representation:
 
@@ -299,7 +299,7 @@ name: John
 ```
 ~11 tokens (with quotes and braces)
 
-**Restricted YAML:**
+**Deterministic YAML:**
 ```yaml
 active: true
 age: 30
@@ -316,7 +316,7 @@ name: John
 - Compact: `{"name":"John"}`
 - Normalized: Same structure
 
-**Restricted YAML**: Low variance (only key ordering differences, but keys are sorted)
+**Deterministic YAML**: Low variance (only key ordering differences, but keys are sorted)
 - Always unquoted strings (when allowed)
 - Always block style
 - Always 2-space indentation
@@ -334,13 +334,13 @@ name: John
 ### 1. Reduced Variance
 
 - **Standard YAML**: 40-80% uniqueness across runs
-- **Restricted YAML**: 0-5% uniqueness (only if data structure differs)
+- **Deterministic YAML**: 0-5% uniqueness (only if data structure differs)
 - **Variance reduction**: ~95-100%
 
 ### 2. Token Efficiency
 
 - **JSON**: ~30 tokens (compact)
-- **Restricted YAML**: ~23 tokens
+- **Deterministic YAML**: ~23 tokens
 - **Savings**: ~23% fewer tokens
 
 ### 3. LLM-Friendly
@@ -384,31 +384,31 @@ name: John
 
 ## Implementation
 
-See `restricted_yaml.py` for:
-- `to_restricted_yaml()`: Convert Python data to restricted YAML
-- `validate()`: Check if YAML conforms to restricted syntax
-- `normalize()`: Convert any YAML to restricted format
+See `deterministic_yaml.py` for:
+- `to_deterministic_yaml()`: Convert Python data to deterministic YAML
+- `validate()`: Check if YAML conforms to deterministic syntax
+- `normalize()`: Convert any YAML to deterministic format
 
-See `restricted_yaml_parser.py` for:
+See `deterministic_yaml_parser.py` for:
 - Custom parser implementation (optional - standard YAML parsers work too)
 
 ## YAML Compatibility
 
-**Restricted YAML is fully compatible with standard YAML parsers.**
+**Deterministic YAML is fully compatible with standard YAML parsers.**
 
-You can use any YAML parser to read Restricted YAML:
+You can use any YAML parser to read Deterministic YAML:
 
 ```python
 import yaml
 
-# Restricted YAML can be parsed by PyYAML
-restricted_yaml = """
+# Deterministic YAML can be parsed by PyYAML
+deterministic_yaml = """
 name: John
 age: 30
 active: true
 """
 
-data = yaml.safe_load(restricted_yaml)  # Works perfectly!
+data = yaml.safe_load(deterministic_yaml)  # Works perfectly!
 ```
 
 This means:
@@ -420,7 +420,7 @@ This means:
 ## Usage Example
 
 ```python
-from restricted_yaml import RestrictedYAML
+from deterministic_yaml import DeterministicYAML
 
 data = {
     'name': 'John',
@@ -428,29 +428,29 @@ data = {
     'active': True
 }
 
-# Generate restricted YAML
-yaml_str = RestrictedYAML.to_restricted_yaml(data)
+# Generate deterministic YAML
+yaml_str = DeterministicYAML.to_deterministic_yaml(data)
 # Result: Always the same format (keys sorted, deterministic)
 
 # Validate
-is_valid, error = RestrictedYAML.validate(yaml_str)
+is_valid, error = DeterministicYAML.validate(yaml_str)
 
 # Normalize existing YAML
-normalized = RestrictedYAML.normalize(existing_yaml)
+normalized = DeterministicYAML.normalize(existing_yaml)
 ```
 
 ## Best Practices
 
 1. **Sort keys alphabetically** for maximum determinism (mandatory)
 2. **Use `_comment` fields** instead of comments
-3. **Validate output** to ensure it conforms to restricted syntax
+3. **Validate output** to ensure it conforms to deterministic syntax
 4. **Normalize existing YAML** before comparing or processing
-5. **Use restricted YAML for LLM generation** to reduce variance
+5. **Use deterministic YAML for LLM generation** to reduce variance
 6. **Use UTF-8 encoding** with `\n` line endings only
 
 ## Conclusion
 
-Restricted YAML provides:
+Deterministic YAML provides:
 - **95-100% variance reduction** vs standard YAML
 - **20-30% token savings** vs JSON
 - **Deterministic output** (same data → same YAML)

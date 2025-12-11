@@ -1,16 +1,16 @@
-# Formal Rule: Comments in Restricted YAML
+# Formal Rule: Comments in Deterministic YAML
 
 ## Rule Statement
 
-**Comments are explicitly forbidden in Restricted YAML.**
+**Comments are explicitly forbidden in Deterministic YAML.**
 
-The YAML comment syntax (`#`) is not part of the Restricted YAML grammar and may not appear in Restricted YAML documents except as part of a quoted string value.
+The YAML comment syntax (`#`) is not part of the Deterministic YAML grammar and may not appear in Deterministic YAML documents except as part of a quoted string value.
 
 ## Formal Definition
 
 ### Prohibition
 
-The `#` character is **not** a valid token in Restricted YAML grammar, except when it appears inside a double-quoted string value.
+The `#` character is **not** a valid token in Deterministic YAML grammar, except when it appears inside a double-quoted string value.
 
 **Forbidden forms:**
 - Line comments: `# This is a comment`
@@ -115,7 +115,7 @@ age: 30
 
 ## Validation
 
-A Restricted YAML validator must:
+A Deterministic YAML validator must:
 
 1. **Reject** any occurrence of `#` outside quoted strings
 2. **Accept** `_comment` fields as regular key-value pairs
@@ -124,7 +124,7 @@ A Restricted YAML validator must:
 ### Validation Example
 
 ```python
-from lib.restricted_yaml import RestrictedYAML
+from lib.deterministic_yaml import DeterministicYAML
 
 yaml_text = """
 # This is a comment (INVALID)
@@ -132,13 +132,13 @@ name: John
 age: 30  # inline comment (INVALID)
 """
 
-is_valid, error = RestrictedYAML.validate(yaml_text)
+is_valid, error = DeterministicYAML.validate(yaml_text)
 # Returns: (False, "Line 2: Comments not allowed; Line 3: Comments not allowed")
 ```
 
 ## GBNF Grammar Reflection
 
-The GBNF grammar (`restricted_yaml.gbnf`) explicitly excludes comments:
+The GBNF grammar (`deterministic_yaml.gbnf`) explicitly excludes comments:
 
 - No `COMMENT` production rule
 - No `#` token definition
@@ -155,26 +155,26 @@ The grammar comment section states:
 
 ### Parser Behavior
 
-A Restricted YAML parser must:
+A Deterministic YAML parser must:
 - **Reject** input containing `#` outside quoted strings
 - **Accept** `_comment` as a valid key (treated like any other key)
 - **Report** validation errors with line numbers
 
 ### Normalizer Behavior
 
-A Restricted YAML normalizer must:
+A Deterministic YAML normalizer must:
 - **Remove** all comments (lines starting with `#`, inline `# comment`)
 - **Preserve** data structure
 - **Optionally convert** comments to `_comment` fields (if requested)
 
 ## Summary
 
-| Aspect | Standard YAML | Restricted YAML |
+| Aspect | Standard YAML | Deterministic YAML |
 |--------|---------------|-----------------|
 | Comments | Allowed (`#`) | **Forbidden** |
 | Documentation | Comments | `_comment` fields |
 | Determinism | Low (comments vary) | High (comments are data) |
 | LLM-friendly | No (ambiguous) | Yes (explicit) |
 
-**Formal Rule**: `#` is not a valid token in Restricted YAML grammar. Use `_comment: "documentation"` for documentation needs.
+**Formal Rule**: `#` is not a valid token in Deterministic YAML grammar. Use `_comment: "documentation"` for documentation needs.
 

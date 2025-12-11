@@ -4,7 +4,7 @@ Analyze logit distributions and token probabilities at specific positions.
 This script demonstrates how JSON's rigid grammar creates sharp probability
 distributions while YAML's flexible grammar creates flatter distributions.
 
-Copyright (c) 2025 Exergy LLC
+Copyright (c) 2025 Exergy ∞ LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

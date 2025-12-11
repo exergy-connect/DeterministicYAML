@@ -1,4 +1,4 @@
-# Restricted YAML GBNF Grammar
+# Deterministic YAML GBNF Grammar
 # For use with llama.cpp and other GBNF-compatible parsers
 
 # Entry point
@@ -45,8 +45,8 @@ SP ::= " "
 # COMMENTS: EXPLICITLY FORBIDDEN
 # ============================================================================
 #
-# Formal Rule: Comments are strictly forbidden in Restricted YAML.
-# The '#' character may NOT appear in Restricted YAML except as part of
+# Formal Rule: Comments are strictly forbidden in Deterministic YAML.
+# The '#' character may NOT appear in Deterministic YAML except as part of
 # a quoted string value.
 #
 # This means:

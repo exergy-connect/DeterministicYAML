@@ -1,8 +1,8 @@
-# Cursor Rules: Restricted YAML Mode
+# Cursor Rules: Deterministic YAML Mode
 
-When generating YAML output, always follow the Restricted YAML Specification.
+When generating YAML output, always follow the Deterministic YAML Specification.
 
-## Restricted YAML Specification
+## Deterministic YAML Specification
 
 1. **Keys**: Unquoted ASCII identifiers `[A-Za-z0-9_]+`, always end with colon
 2. **String Values**: Unquoted only if `[A-Za-z0-9_]+`, otherwise double-quoted. Empty string is `""`
@@ -27,7 +27,7 @@ When generating YAML output, always follow the Restricted YAML Specification.
 
 - Validate all output adheres to rules
 - Normalize: sort keys, quote unsafe strings, convert illegal formats
-- Emit only Restricted YAML (no commentary unless asked)
+- Emit only Deterministic YAML (no commentary unless asked)
 - Consistency > readability
 - If structure can't be expressed canonically, fall back to quoting
 

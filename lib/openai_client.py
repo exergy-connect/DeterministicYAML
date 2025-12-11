@@ -1,7 +1,7 @@
 """
 OpenAI API client wrapper for quantifying JSON vs YAML differences.
 
-Copyright (c) 2025 Exergy LLC
+Copyright (c) 2025 Exergy ∞ LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

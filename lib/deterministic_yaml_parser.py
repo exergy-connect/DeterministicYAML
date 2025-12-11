@@ -1,5 +1,5 @@
 """
-Parser for Restricted YAML based on the formal grammar.
+Parser for Deterministic YAML based on the formal grammar.
 
 Grammar:
   yaml ::= element(0)
@@ -10,7 +10,7 @@ Grammar:
   list_item(indent) ::= INDENT(indent) "-" SP list_value(indent + 1)
   scalar ::= IDENT | QUOTED | NUMBER | BOOLEAN | NULL
 
-Copyright (c) 2025 Exergy LLC
+Copyright (c) 2025 Exergy ∞ LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,8 +35,8 @@ import re
 from typing import Any, List, Tuple, Optional, Union
 
 
-class RestrictedYAMLParser:
-    """Parser for Restricted YAML based on formal grammar."""
+class DeterministicYAMLParser:
+    """Parser for Deterministic YAML based on formal grammar."""
     
     # Token patterns
     IDENT_PATTERN = re.compile(r'^[A-Za-z0-9_]+$')
@@ -374,16 +374,16 @@ class RestrictedYAMLParser:
         return True
 
 
-def parse_restricted_yaml(text: str) -> Any:
-    """Parse Restricted YAML text into Python object."""
-    parser = RestrictedYAMLParser(text)
+def parse_deterministic_yaml(text: str) -> Any:
+    """Parse Deterministic YAML text into Python object."""
+    parser = DeterministicYAMLParser(text)
     return parser.parse()
 
 
 def test_parser():
     """Test the parser with various examples."""
     print("=" * 80)
-    print("RESTRICTED YAML PARSER TESTS")
+    print("DETERMINISTIC YAML PARSER TESTS")
     print("=" * 80)
     
     test_cases = [
@@ -401,7 +401,7 @@ def test_parser():
         print(f"\nTest {i}:")
         print(f"  Input: {repr(yaml_text)}")
         try:
-            result = parse_restricted_yaml(yaml_text)
+            result = parse_deterministic_yaml(yaml_text)
             print(f"  Result: {result}")
             print(f"  Expected: {expected}")
             if result == expected:

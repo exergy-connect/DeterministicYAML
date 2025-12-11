@@ -1,5 +1,5 @@
 """
-Restricted YAML syntax definition and utilities.
+Deterministic YAML syntax definition and utilities.
 
 This defines a subset of YAML that:
 1. Reduces variance (more deterministic)
@@ -7,7 +7,7 @@ This defines a subset of YAML that:
 3. Is easier for LLMs to generate consistently
 4. Fully deterministic (same data → same YAML)
 
-Copyright (c) 2025 Exergy LLC
+Copyright (c) 2025 Exergy ∞ LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,9 +34,9 @@ import re
 from typing import Any, Dict, List, Optional, Union
 
 
-class RestrictedYAML:
+class DeterministicYAML:
     """
-    Restricted YAML syntax specification with strict deterministic rules.
+    Deterministic YAML syntax specification with strict deterministic rules.
     """
     
     # YAML indicator characters
@@ -67,11 +67,11 @@ class RestrictedYAML:
             return True  # Empty string must be quoted
         
         # Check for YAML indicators
-        if any(char in RestrictedYAML.YAML_INDICATORS for char in value):
+        if any(char in DeterministicYAML.YAML_INDICATORS for char in value):
             return True
         
         # Check if starts with indicator character
-        if value[0] in RestrictedYAML.YAML_START_INDICATORS:
+        if value[0] in DeterministicYAML.YAML_START_INDICATORS:
             return True
         
         # Check if starts or ends with whitespace
@@ -83,20 +83,20 @@ class RestrictedYAML:
             return True
         
         # Check if matches integer pattern
-        if RestrictedYAML.INTEGER_PATTERN.match(value):
+        if DeterministicYAML.INTEGER_PATTERN.match(value):
             return True
         
         # Check if matches float pattern
-        if RestrictedYAML.FLOAT_PATTERN.match(value):
+        if DeterministicYAML.FLOAT_PATTERN.match(value):
             return True
         
         # Check for leading zeros (e.g., 01, 007)
-        if RestrictedYAML.LEADING_ZERO_PATTERN.match(value):
+        if DeterministicYAML.LEADING_ZERO_PATTERN.match(value):
             return True
         
         # Check for underscores in numeric context (e.g., 1_000)
         # But allow underscores in identifiers (e.g., hello_world)
-        if '_' in value and RestrictedYAML.INTEGER_PATTERN.match(value.replace('_', '')):
+        if '_' in value and DeterministicYAML.INTEGER_PATTERN.match(value.replace('_', '')):
             return True
         
         # Check for plus signs (e.g., +42, +.5)
@@ -108,7 +108,7 @@ class RestrictedYAML:
             return True
         
         # Check for timestamps
-        if RestrictedYAML.TIMESTAMP_PATTERN.match(value):
+        if DeterministicYAML.TIMESTAMP_PATTERN.match(value):
             return True
         
         # Check for floats without leading digits (e.g., .5)
@@ -210,16 +210,16 @@ class RestrictedYAML:
         return str(value)
     
     @staticmethod
-    def to_restricted_yaml(data: Any, indent: int = 0) -> str:
+    def to_deterministic_yaml(data: Any, indent: int = 0) -> str:
         """
-        Convert Python data structure to restricted YAML.
+        Convert Python data structure to deterministic YAML.
         
         Args:
             data: Python object (dict, list, str, int, float, bool, None)
             indent: Current indentation level
         
         Returns:
-            Restricted YAML string
+            Deterministic YAML string
         """
         indent_str = '  ' * indent
         
@@ -230,14 +230,14 @@ class RestrictedYAML:
             return 'true' if data else 'false'
         
         elif isinstance(data, int):
-            return RestrictedYAML.canonicalize_number(data)
+            return DeterministicYAML.canonicalize_number(data)
         
         elif isinstance(data, float):
-            return RestrictedYAML.canonicalize_number(data)
+            return DeterministicYAML.canonicalize_number(data)
         
         elif isinstance(data, str):
-            if RestrictedYAML.needs_quotes(data):
-                escaped = RestrictedYAML.escape_string(data)
+            if DeterministicYAML.needs_quotes(data):
+                escaped = DeterministicYAML.escape_string(data)
                 return f'"{escaped}"'
             else:
                 return data
@@ -248,7 +248,7 @@ class RestrictedYAML:
             
             lines = []
             for item in data:
-                item_yaml = RestrictedYAML.to_restricted_yaml(item, indent + 1)
+                item_yaml = DeterministicYAML.to_deterministic_yaml(item, indent + 1)
                 # List items are indented one level more
                 lines.append(f'{indent_str}- {item_yaml}')
             
@@ -266,10 +266,10 @@ class RestrictedYAML:
                 if not re.match(r'^[A-Za-z0-9_]+$', key_str):
                     # Invalid key - should quote or reject
                     # For now, quote it (but this violates spec)
-                    key_str = f'"{RestrictedYAML.escape_string(key_str)}"'
+                    key_str = f'"{DeterministicYAML.escape_string(key_str)}"'
                 
                 # Value
-                value_yaml = RestrictedYAML.to_restricted_yaml(value, indent + 1)
+                value_yaml = DeterministicYAML.to_deterministic_yaml(value, indent + 1)
                 
                 # If value is multiline (list or dict), put key: on one line, value on next
                 if isinstance(value, (dict, list)) and value:
@@ -285,12 +285,12 @@ class RestrictedYAML:
         
         else:
             # Fallback: convert to string and quote
-            return f'"{RestrictedYAML.escape_string(str(data))}"'
+            return f'"{DeterministicYAML.escape_string(str(data))}"'
     
     @staticmethod
     def validate(yaml_str: str) -> tuple[bool, Optional[str]]:
         """
-        Validate that YAML string conforms to restricted syntax.
+        Validate that YAML string conforms to deterministic syntax.
         
         Returns:
             (is_valid, error_message)
@@ -365,19 +365,19 @@ class RestrictedYAML:
     @staticmethod
     def normalize(yaml_str: str) -> str:
         """
-        Normalize YAML to restricted format.
+        Normalize YAML to deterministic format.
         
-        This converts any valid YAML to restricted YAML format.
+        This converts any valid YAML to deterministic YAML format.
         """
         try:
             data = yaml.safe_load(yaml_str)
-            return RestrictedYAML.to_restricted_yaml(data)
+            return DeterministicYAML.to_deterministic_yaml(data)
         except Exception as e:
             raise ValueError(f"Failed to normalize YAML: {e}")
 
 
 def compare_formats():
-    """Compare JSON, standard YAML, and restricted YAML."""
+    """Compare JSON, standard YAML, and deterministic YAML."""
     test_data = {
         'name': 'John',
         'age': 30,
@@ -393,7 +393,7 @@ def compare_formats():
     json_str = json.dumps(test_data, indent=2)
     json_compact = json.dumps(test_data)
     yaml_standard = yaml.dump(test_data, default_flow_style=False)
-    yaml_restricted = RestrictedYAML.to_restricted_yaml(test_data)
+    yaml_deterministic = DeterministicYAML.to_deterministic_yaml(test_data)
     
     print("=" * 80)
     print("FORMAT COMPARISON")
@@ -408,8 +408,8 @@ def compare_formats():
     print("\nYAML (standard):")
     print(yaml_standard)
     
-    print("\nYAML (restricted):")
-    print(yaml_restricted)
+    print("\nYAML (deterministic):")
+    print(yaml_deterministic)
     
     # Count tokens (approximation)
     def count_tokens(text):
@@ -418,7 +418,7 @@ def compare_formats():
     json_tokens = count_tokens(json_str)
     json_compact_tokens = count_tokens(json_compact)
     yaml_standard_tokens = count_tokens(yaml_standard)
-    yaml_restricted_tokens = count_tokens(yaml_restricted)
+    yaml_deterministic_tokens = count_tokens(yaml_deterministic)
     
     print("\n" + "=" * 80)
     print("TOKEN COUNT COMPARISON")
@@ -426,7 +426,7 @@ def compare_formats():
     print(f"JSON (pretty):        {json_tokens:3d} tokens")
     print(f"JSON (compact):       {json_compact_tokens:3d} tokens")
     print(f"YAML (standard):      {yaml_standard_tokens:3d} tokens")
-    print(f"YAML (restricted):    {yaml_restricted_tokens:3d} tokens")
+    print(f"YAML (deterministic):    {yaml_deterministic_tokens:3d} tokens")
     
     print("\n" + "=" * 80)
     print("DETERMINISTIC QUOTING TEST")
@@ -446,7 +446,7 @@ def compare_formats():
     
     print("\nString quoting rules:")
     for value, should_quote in test_strings:
-        needs_quotes = RestrictedYAML.needs_quotes(value)
+        needs_quotes = DeterministicYAML.needs_quotes(value)
         status = "✓" if needs_quotes == should_quote else "✗"
         quoted = f'"{value}"' if needs_quotes else value
         print(f"  {status} {repr(value):20s} → {quoted}")

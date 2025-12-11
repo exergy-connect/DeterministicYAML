@@ -1,12 +1,12 @@
-# Cursor Prompt: Restricted YAML Mode
+# Cursor Prompt: Deterministic YAML Mode
 
-You must follow the Restricted YAML Specification below whenever generating YAML.
+You must follow the Deterministic YAML Specification below whenever generating YAML.
 
 Your goal is to produce deterministic, low-variance, LLM-friendly YAML with strict canonical formatting.
 
 **This is a constrained format. Do not deviate.**
 
-## Restricted YAML Specification
+## Deterministic YAML Specification
 
 ### 1. Keys
 
@@ -55,7 +55,7 @@ Your goal is to produce deterministic, low-variance, LLM-friendly YAML with stri
 
 ### 8. Comments - Explicitly Forbidden
 
-**Formal Rule: Comments are strictly forbidden in Restricted YAML.**
+**Formal Rule: Comments are strictly forbidden in Deterministic YAML.**
 
 - **YAML comment syntax (`#`) is not allowed anywhere**
 - This includes line comments, inline comments, and block comments
@@ -105,9 +105,9 @@ Whenever the user requests YAML, you must:
    - Sort keys lexicographically
    - Quote unsafe strings
    - Convert illegal formats
-3. **Emit** only Restricted YAML with no commentary or explanation.
+3. **Emit** only Deterministic YAML with no commentary or explanation.
 
-If the user asks for overflowing or complex YAML features, convert them into the closest valid Restricted YAML structure.
+If the user asks for overflowing or complex YAML features, convert them into the closest valid Deterministic YAML structure.
 
 If the user provides YAML that violates the spec, normalize it automatically.
 
@@ -128,7 +128,7 @@ active: yes
 tags: [dev, ops]
 ```
 
-**Output (restricted YAML):**
+**Output (deterministic YAML):**
 ```yaml
 active: true
 age: 30

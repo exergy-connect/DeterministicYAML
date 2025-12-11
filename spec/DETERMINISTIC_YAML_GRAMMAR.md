@@ -1,10 +1,10 @@
-# Restricted YAML Formal Grammar
+# Deterministic YAML Formal Grammar
 
-This document defines the formal grammar for Restricted YAML using BNF-style notation.
+This document defines the formal grammar for Deterministic YAML using BNF-style notation.
 
 ## Important Note
 
-**Restricted YAML is valid YAML** - this grammar defines a subset of YAML syntax. Any standard YAML parser can parse Restricted YAML correctly. The grammar is provided for reference and to ensure deterministic generation, but you don't need a special parser to read Restricted YAML.
+**Deterministic YAML is valid YAML** - this grammar defines a subset of YAML syntax. Any standard YAML parser can parse Deterministic YAML correctly. The grammar is provided for reference and to ensure deterministic generation, but you don't need a special parser to read Deterministic YAML.
 
 ## Grammar Definition
 
@@ -80,10 +80,10 @@ SP ::= " "
 # Comments -----------------------------------------------------------------
 
 # EXPLICITLY FORBIDDEN: The '#' character is not part of the grammar.
-# Comments are not allowed in Restricted YAML.
+# Comments are not allowed in Deterministic YAML.
 # 
 # Formal Rule: Comments are strictly forbidden. The '#' character may not
-# appear in Restricted YAML except as part of a quoted string value.
+# appear in Deterministic YAML except as part of a quoted string value.
 #
 # Sanctioned Alternative: Use _comment key-value pairs for documentation.
 # Example:
@@ -141,7 +141,7 @@ Five types:
 
 ## Examples
 
-### Valid Restricted YAML
+### Valid Deterministic YAML
 
 **Mapping:**
 ```yaml
@@ -184,9 +184,9 @@ description: "A quoted string"
 - `key: value  # inline comment` (inline comments **explicitly forbidden**)
 - `key: ~` (null must be `null`, not `~`)
 
-**Note on Comments**: The `#` character is not part of the Restricted YAML grammar. Comments are explicitly forbidden. Use `_comment: "documentation"` key-value pairs instead.
+**Note on Comments**: The `#` character is not part of the Deterministic YAML grammar. Comments are explicitly forbidden. Use `_comment: "documentation"` key-value pairs instead.
 
 ## Parser Implementation
 
-See `restricted_yaml_parser.py` for a parser implementation based on this grammar.
+See `deterministic_yaml_parser.py` for a parser implementation based on this grammar.
 

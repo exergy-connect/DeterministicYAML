@@ -1,11 +1,11 @@
 # Deterministic YAML
 
 A **deterministic, LLM-friendly subset of YAML** that remains **100% valid YAML**, while eliminating ambiguity, output variance, and syntax hazards.  
-Restricted YAML provides a canonical, predictable serialization format ideal for structured data generation and configuration.
+Deterministic YAML provides a canonical, predictable serialization format ideal for structured data generation and configuration.
 
 ---
 
-## 🚀 Why Restricted YAML?
+## 🚀 Why Deterministic YAML?
 
 Standard YAML is flexible but inconsistent:
 
@@ -23,7 +23,7 @@ All of these introduce branching points that increase **LLM decoding entropy**, 
 
 JSON solves some of these issues but wastes tokens and is less human-friendly.  
 
-**Restricted YAML** hits the middle ground: predictable like JSON, compact and readable like YAML.
+**Deterministic YAML** hits the middle ground: predictable like JSON, compact and readable like YAML.
 
 ---
 
@@ -50,8 +50,8 @@ JSON solves some of these issues but wastes tokens and is less human-friendly.
 
 ## 📦 Included Tools
 
-- **GBNF grammar** for Restricted YAML  
-- **Python library** (`RestrictedYAML`) for canonical serialization  
+- **GBNF grammar** for Deterministic YAML  
+- **Python library** (`DeterministicYAML`) for canonical serialization  
 - **Validator** to ensure conformance  
 - **Canonicalizer** to normalize arbitrary YAML  
 - **Examples & tests** demonstrating deterministic output
@@ -63,9 +63,9 @@ JSON solves some of these issues but wastes tokens and is less human-friendly.
 ### Basic Usage
 
 ```python
-from lib.restricted_yaml import RestrictedYAML
+from lib.deterministic_yaml import DeterministicYAML
 
-# Convert Python data to Restricted YAML
+# Convert Python data to Deterministic YAML
 data = {
     'name': 'John',
     'age': 30,
@@ -77,7 +77,7 @@ data = {
     }
 }
 
-yaml_str = RestrictedYAML.to_restricted_yaml(data)
+yaml_str = DeterministicYAML.to_deterministic_yaml(data)
 print(yaml_str)
 ```
 
@@ -99,16 +99,16 @@ Note: Keys are automatically sorted lexicographically (notice `active` comes bef
 ### Validate YAML
 
 ```python
-# Check if YAML conforms to Restricted YAML spec
+# Check if YAML conforms to Deterministic YAML spec
 yaml_text = """
 name: John
 age: 30
 active: true
 """
 
-is_valid, error = RestrictedYAML.validate(yaml_text)
+is_valid, error = DeterministicYAML.validate(yaml_text)
 if is_valid:
-    print("✓ Valid Restricted YAML")
+    print("✓ Valid Deterministic YAML")
 else:
     print(f"✗ Invalid: {error}")
 ```
@@ -116,7 +116,7 @@ else:
 ### Normalize Existing YAML
 
 ```python
-# Convert any YAML to Restricted YAML format
+# Convert any YAML to Deterministic YAML format
 standard_yaml = """
 # This is a comment
 name: "John"  # Quoted string
@@ -124,8 +124,8 @@ age: 30
 tags: [dev, ops]  # Flow style
 """
 
-restricted_yaml = RestrictedYAML.normalize(standard_yaml)
-print(restricted_yaml)
+deterministic_yaml = DeterministicYAML.normalize(standard_yaml)
+print(deterministic_yaml)
 ```
 
 **Output:**
@@ -146,7 +146,7 @@ Comments removed, quotes removed (when safe), flow style converted to block styl
 strings = ['John', 'John Doe', '42', 'true', 'hello-world']
 
 for s in strings:
-    needs_quotes = RestrictedYAML.needs_quotes(s)
+    needs_quotes = DeterministicYAML.needs_quotes(s)
     result = f'"{s}"' if needs_quotes else s
     print(f"{s:15} → {result}")
 ```
@@ -160,19 +160,19 @@ true            → "true"
 hello-world     → "hello-world"
 ```
 
-### Parse Restricted YAML
+### Parse Deterministic YAML
 
 ```python
 import yaml
 
-# Restricted YAML is valid YAML - use any YAML parser
-restricted_yaml = """
+# Deterministic YAML is valid YAML - use any YAML parser
+deterministic_yaml = """
 active: true
 age: 30
 name: John
 """
 
-data = yaml.safe_load(restricted_yaml)
+data = yaml.safe_load(deterministic_yaml)
 print(data)  # {'active': True, 'age': 30, 'name': 'John'}
 ```
 
@@ -180,7 +180,7 @@ print(data)  # {'active': True, 'age': 30, 'name': 'John'}
 
 ### Tool Output Examples
 
-#### Variance Comparison (`compare_restricted_yaml.py`)
+#### Variance Comparison (`compare_deterministic_yaml.py`)
 
 ```
 VARIANCE ANALYSIS
@@ -196,12 +196,12 @@ Standard YAML:
   Uniqueness ratio: 16.67%
   Structural variance: 10.00%
 
-Restricted YAML:
+Deterministic YAML:
   Unique outputs: 3/30
   Uniqueness ratio: 10.00%
   Structural variance: 3.33%
 
-Variance reduction (Restricted vs Standard YAML): 40.0%
+Variance reduction (Deterministic vs Standard YAML): 40.0%
 
 TOKEN COUNT COMPARISON
 ======================
@@ -209,11 +209,11 @@ TOKEN COUNT COMPARISON
 JSON (pretty):         40 tokens
 JSON (compact):        31 tokens
 Standard YAML:         25 tokens
-Restricted YAML:       26 tokens
+Deterministic YAML:       26 tokens
 
 Token savings vs JSON (compact):
   Standard YAML:      19.4%
-  Restricted YAML:    16.1%
+  Deterministic YAML:    16.1%
 ```
 
 #### Token Count Analysis (`token_count_analysis.py`)
@@ -248,7 +248,7 @@ YAML COMPATIBILITY TEST
 =======================
 
 Test 1: Simple mapping
-  Restricted YAML:
+  Deterministic YAML:
   active: true
   age: 30
   name: John
@@ -257,7 +257,7 @@ Test 1: Simple mapping
   ✓ Parsed by custom parser: matches
 
 Test 2: Nested mapping
-  Restricted YAML:
+  Deterministic YAML:
   config:
     host: localhost
     port: 5432

@@ -1,4 +1,4 @@
-Here’s a side‑by‑side comparison between TOON (Token‑Oriented Object Notation) and “Restricted YAML” (RY) — highlighting where each wins, where each struggles, and how they differ in style, compatibility, and trade‑offs.
+Here’s a side‑by‑side comparison between TOON (Token‑Oriented Object Notation) and “Deterministic YAML” (RY) — highlighting where each wins, where each struggles, and how they differ in style, compatibility, and trade‑offs.
 
 ---
 
@@ -11,9 +11,9 @@ Here’s a side‑by‑side comparison between TOON (Token‑Oriented Object Not
 
 ---
 
-## ✅ What Restricted YAML brings to the table (and where TOON differs)
+## ✅ What Deterministic YAML brings to the table (and where TOON differs)
 
-| **Dimension**                      | **TOON**                                                                                                                                                               | **Restricted YAML (RY)**                                                                                                                          |
+| **Dimension**                      | **TOON**                                                                                                                                                               | **Deterministic YAML (RY)**                                                                                                                          |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Syntax/Form**                    | New format (`.toon`, custom syntax), not standard JSON or YAML.                                                                                                        | Full subset of standard YAML 1.2 — valid YAML, parseable by any YAML parser.                                                                      |
 | **Compatibility / Ecosystem**      | Requires dedicated parsers/serializers; not out‑of‑the‑box with JSON/YAML tooling.                                                                                     | Works with all existing YAML tools — no custom runtime needed.                                                                                    |
@@ -26,7 +26,7 @@ Here’s a side‑by‑side comparison between TOON (Token‑Oriented Object Not
 
 ---
 
-## 🧩 Example: Same Data in JSON vs TOON vs Restricted YAML
+## 🧩 Example: Same Data in JSON vs TOON vs Deterministic YAML
 
 Suppose we have this data (list of users):
 
@@ -49,7 +49,7 @@ users[2]{id,name,role}:
   2,Bob,user
 ```
 
-**Restricted YAML (RY)**
+**Deterministic YAML (RY)**
 
 ```yaml
 users:
@@ -78,7 +78,7 @@ users:
 * You control the full toolchain or use TOON‑aware parsers/serializers.
 * You accept “new syntax” in exchange for compactness.
 
-### When Restricted YAML is a better bet:
+### When Deterministic YAML is a better bet:
 
 * You want **tooling compatibility** — existing YAML parsers should work without changes.
 * You value **human readability**, maintainability, ease of versioning/diffs.
@@ -97,13 +97,13 @@ If I were building a system today where:
 * I want interoperability with existing YAML toolchains
 * I care about readability and version control —
 
-I’d go with **Restricted YAML**.
+I’d go with **Deterministic YAML**.
 
 If instead I’m generating large data tables, pushing maximal token efficiency, and controlling the full boundary between my code and the LLM (i.e. not exposing the format to external tooling), **TOON** becomes compelling, especially for arrays of objects.
 
 ---
 
-If you like — I can **extend this comparison** with **a 3‑way chart** (JSON, TOON, Restricted YAML) including **token count estimates, variance risk, toolchain burden**, and **ideal domains of use** — to help you pick format strategy per use case.
+If you like — I can **extend this comparison** with **a 3‑way chart** (JSON, TOON, Deterministic YAML) including **token count estimates, variance risk, toolchain burden**, and **ideal domains of use** — to help you pick format strategy per use case.
 
 [1]: https://github.com/toon-format/toon?utm_source=chatgpt.com "GitHub - toon-format/toon: 🎒 Token-Oriented Object Notation (TOON) – Compact, human-readable, schema-aware JSON for LLM prompts. Spec, benchmarks, TypeScript SDK."
 [2]: https://toonformat.dev/?utm_source=chatgpt.com "TOON | Token-Oriented Object Notation"

@@ -1,7 +1,7 @@
 """
-Compare variance and token counts: JSON vs Standard YAML vs Restricted YAML.
+Compare variance and token counts: JSON vs Standard YAML vs Deterministic YAML.
 
-Copyright (c) 2025 Exergy LLC
+Copyright (c) 2025 Exergy ∞ LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ SOFTWARE.
 
 import json
 import yaml
-from restricted_yaml import RestrictedYAML
+from deterministic_yaml import DeterministicYAML
 from quantify_differences import LLMQuantifier
 from collections import Counter
 
@@ -32,18 +32,18 @@ from collections import Counter
 class MockClient:
     """Mock client that simulates different variance levels."""
     
-    def __init__(self, json_variance=0.1, yaml_variance=0.6, restricted_yaml_variance=0.15):
+    def __init__(self, json_variance=0.1, yaml_variance=0.6, deterministic_yaml_variance=0.15):
         self.json_variance = json_variance
         self.yaml_variance = yaml_variance
-        self.restricted_yaml_variance = restricted_yaml_variance
+        self.deterministic_yaml_variance = deterministic_yaml_variance
     
     def generate(self, prompt, max_tokens=50, temperature=1.0, **kwargs):
         text = prompt.lower()
         
         if 'json' in text:
             base = '{"name": "John", "age": 30, "active": true}'
-            if 'restricted' in text:
-                # Restricted JSON (always compact, no pretty variants)
+            if 'deterministic' in text or 'restricted' in text:
+                # Deterministic JSON (always compact, no pretty variants)
                 return base, None
             else:
                 # Standard JSON (some formatting variance)
@@ -57,11 +57,11 @@ class MockClient:
                 return base, None
         
         elif 'yaml' in text:
-            if 'restricted' in text:
-                # Restricted YAML (always same format)
+            if 'deterministic' in text or 'restricted' in text:
+                # Deterministic YAML (always same format)
                 base = 'name: John\nage: 30\nactive: true'
                 import random
-                if random.random() < self.restricted_yaml_variance:
+                if random.random() < self.deterministic_yaml_variance:
                     # Only key ordering differences
                     variants = [
                         'name: John\nage: 30\nactive: true',
@@ -94,9 +94,9 @@ def count_tokens(text):
 
 
 def run_comparison():
-    """Compare JSON, standard YAML, and restricted YAML."""
+    """Compare JSON, standard YAML, and deterministic YAML."""
     print("=" * 80)
-    print("JSON vs STANDARD YAML vs RESTRICTED YAML")
+    print("JSON vs STANDARD YAML vs DETERMINISTIC YAML")
     print("=" * 80)
     
     client = MockClient()
@@ -117,10 +117,10 @@ def run_comparison():
         text, _ = client.generate("Generate YAML:", temperature=1.0)
         yaml_outputs.append(text.strip())
     
-    restricted_yaml_outputs = []
+    deterministic_yaml_outputs = []
     for _ in range(num_runs):
-        text, _ = client.generate("Generate restricted YAML:", temperature=1.0)
-        restricted_yaml_outputs.append(text.strip())
+        text, _ = client.generate("Generate deterministic YAML:", temperature=1.0)
+        deterministic_yaml_outputs.append(text.strip())
     
     # Analyze variance
     print("\n" + "=" * 80)
@@ -129,7 +129,7 @@ def run_comparison():
     
     json_variance = quantifier.calculate_variance(json_outputs)
     yaml_variance = quantifier.calculate_variance(yaml_outputs)
-    restricted_yaml_variance = quantifier.calculate_variance(restricted_yaml_outputs)
+    deterministic_yaml_variance = quantifier.calculate_variance(deterministic_yaml_outputs)
     
     print(f"\nJSON:")
     print(f"  Unique outputs: {json_variance['unique_count']}/{json_variance['total_runs']}")
@@ -141,15 +141,15 @@ def run_comparison():
     print(f"  Uniqueness ratio: {yaml_variance['uniqueness_ratio']:.2%}")
     print(f"  Structural variance: {yaml_variance['structural_variance']:.2%}")
     
-    print(f"\nRestricted YAML:")
-    print(f"  Unique outputs: {restricted_yaml_variance['unique_count']}/{restricted_yaml_variance['total_runs']}")
-    print(f"  Uniqueness ratio: {restricted_yaml_variance['uniqueness_ratio']:.2%}")
-    print(f"  Structural variance: {restricted_yaml_variance['structural_variance']:.2%}")
+    print(f"\nDeterministic YAML:")
+    print(f"  Unique outputs: {deterministic_yaml_variance['unique_count']}/{deterministic_yaml_variance['total_runs']}")
+    print(f"  Uniqueness ratio: {deterministic_yaml_variance['uniqueness_ratio']:.2%}")
+    print(f"  Structural variance: {deterministic_yaml_variance['structural_variance']:.2%}")
     
     # Calculate variance reduction
     if yaml_variance['uniqueness_ratio'] > 0:
-        reduction = (yaml_variance['uniqueness_ratio'] - restricted_yaml_variance['uniqueness_ratio']) / yaml_variance['uniqueness_ratio'] * 100
-        print(f"\nVariance reduction (Restricted vs Standard YAML): {reduction:.1f}%")
+        reduction = (yaml_variance['uniqueness_ratio'] - deterministic_yaml_variance['uniqueness_ratio']) / yaml_variance['uniqueness_ratio'] * 100
+        print(f"\nVariance reduction (Deterministic vs Standard YAML): {reduction:.1f}%")
     
     # Token count comparison
     print("\n" + "=" * 80)
@@ -170,21 +170,21 @@ def run_comparison():
     json_pretty = json.dumps(test_data, indent=2)
     json_compact = json.dumps(test_data)
     yaml_standard = yaml.dump(test_data, default_flow_style=False)
-    yaml_restricted = RestrictedYAML.to_restricted_yaml(test_data)
+    yaml_deterministic = DeterministicYAML.to_deterministic_yaml(test_data)
     
     json_pretty_tokens = count_tokens(json_pretty)
     json_compact_tokens = count_tokens(json_compact)
     yaml_standard_tokens = count_tokens(yaml_standard)
-    yaml_restricted_tokens = count_tokens(yaml_restricted)
+    yaml_deterministic_tokens = count_tokens(yaml_deterministic)
     
     print(f"\nJSON (pretty):        {json_pretty_tokens:3d} tokens")
     print(f"JSON (compact):       {json_compact_tokens:3d} tokens")
     print(f"Standard YAML:        {yaml_standard_tokens:3d} tokens")
-    print(f"Restricted YAML:      {yaml_restricted_tokens:3d} tokens")
+    print(f"Deterministic YAML:      {yaml_deterministic_tokens:3d} tokens")
     
     print(f"\nToken savings vs JSON (compact):")
     print(f"  Standard YAML:      {((json_compact_tokens - yaml_standard_tokens) / json_compact_tokens * 100):.1f}%")
-    print(f"  Restricted YAML:    {((json_compact_tokens - yaml_restricted_tokens) / json_compact_tokens * 100):.1f}%")
+    print(f"  Deterministic YAML:    {((json_compact_tokens - yaml_deterministic_tokens) / json_compact_tokens * 100):.1f}%")
     
     # Show sample outputs
     print("\n" + "=" * 80)
@@ -199,8 +199,8 @@ def run_comparison():
     for i, output in enumerate(list(set(yaml_outputs))[:5], 1):
         print(f"  {i}. {output}")
     
-    print("\nRestricted YAML samples (unique variants):")
-    for i, output in enumerate(list(set(restricted_yaml_outputs))[:3], 1):
+    print("\nDeterministic YAML samples (unique variants):")
+    for i, output in enumerate(list(set(deterministic_yaml_outputs))[:3], 1):
         print(f"  {i}. {output}")
     
     # Summary
@@ -211,21 +211,21 @@ def run_comparison():
     print(f"\nVariance (uniqueness ratio):")
     print(f"  JSON:              {json_variance['uniqueness_ratio']:.1%}")
     print(f"  Standard YAML:     {yaml_variance['uniqueness_ratio']:.1%}")
-    print(f"  Restricted YAML:   {restricted_yaml_variance['uniqueness_ratio']:.1%}")
+    print(f"  Deterministic YAML:   {deterministic_yaml_variance['uniqueness_ratio']:.1%}")
     
     if yaml_variance['uniqueness_ratio'] > 0:
-        reduction = (yaml_variance['uniqueness_ratio'] - restricted_yaml_variance['uniqueness_ratio']) / yaml_variance['uniqueness_ratio'] * 100
-        print(f"\n  Restricted YAML reduces variance by {reduction:.1f}% vs Standard YAML")
+        reduction = (yaml_variance['uniqueness_ratio'] - deterministic_yaml_variance['uniqueness_ratio']) / yaml_variance['uniqueness_ratio'] * 100
+        print(f"\n  Deterministic YAML reduces variance by {reduction:.1f}% vs Standard YAML")
     
     print(f"\nToken count (for test data):")
     print(f"  JSON (compact):    {json_compact_tokens} tokens")
     print(f"  Standard YAML:     {yaml_standard_tokens} tokens")
-    print(f"  Restricted YAML:   {yaml_restricted_tokens} tokens")
+    print(f"  Deterministic YAML:   {yaml_deterministic_tokens} tokens")
     
     print(f"\nKey Findings:")
-    print(f"  ✓ Restricted YAML has {((yaml_variance['uniqueness_ratio'] - restricted_yaml_variance['uniqueness_ratio']) / yaml_variance['uniqueness_ratio'] * 100):.0f}% lower variance than Standard YAML")
-    print(f"  ✓ Restricted YAML uses {((json_compact_tokens - yaml_restricted_tokens) / json_compact_tokens * 100):.0f}% fewer tokens than JSON")
-    print(f"  ✓ Restricted YAML maintains token efficiency while reducing variance")
+    print(f"  ✓ Deterministic YAML has {((yaml_variance['uniqueness_ratio'] - deterministic_yaml_variance['uniqueness_ratio']) / yaml_variance['uniqueness_ratio'] * 100):.0f}% lower variance than Standard YAML")
+    print(f"  ✓ Deterministic YAML uses {((json_compact_tokens - yaml_deterministic_tokens) / json_compact_tokens * 100):.0f}% fewer tokens than JSON")
+    print(f"  ✓ Deterministic YAML maintains token efficiency while reducing variance")
 
 
 if __name__ == "__main__":
