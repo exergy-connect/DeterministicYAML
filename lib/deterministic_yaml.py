@@ -544,28 +544,32 @@ class DeterministicYAML:
             return data
     
     @staticmethod
-    def normalize(yaml_str: str) -> str:
+    def normalize(yaml_str: str, preserve_comments: bool = True) -> str:
         """
-        Normalize YAML to deterministic format, preserving human comments.
+        Normalize YAML to deterministic format, optionally preserving human comments.
         
         This converts any valid YAML to deterministic YAML format.
-        Comments (both line and inline) are extracted and converted to $human$ fields
-        to preserve human insight as first-class data that survives all operations.
+        When preserve_comments=True, comments (both line and inline) are extracted 
+        and converted to $human$ fields to preserve human insight as first-class data 
+        that survives all operations.
         
         The normalize method:
-        1. Extracts all comments from the original YAML text
+        1. Extracts all comments from the original YAML text (if preserve_comments=True)
         2. Parses the YAML data structure
-        3. Maps comments to their appropriate locations in the structure
+        3. Maps comments to their appropriate locations in the structure (if preserve_comments=True)
         4. Adds them as $human$ key-value pairs (appearing first in each object)
-        5. Generates deterministic YAML with comments preserved as data
+        5. Generates deterministic YAML with comments preserved as data (or stripped if preserve_comments=False)
         
         Args:
             yaml_str: Input YAML string (may contain # comments)
+            preserve_comments: If True, convert comments to $human$ fields. If False, strip all comments
+                             and existing $human$ fields (canonical mode).
         
         Returns:
-            Deterministic YAML string with comments preserved as $human$ fields
+            Deterministic YAML string with comments preserved as $human$ fields (if preserve_comments=True)
+            or pure data without any $human$ fields (if preserve_comments=False)
         
-        Example:
+        Example (preserve_comments=True):
             Input:
                 # User profile
                 name: John  # User's name
@@ -575,25 +579,39 @@ class DeterministicYAML:
                 $human$: "User profile name: User's name"
                 age: 30
                 name: John
+        
+        Example (preserve_comments=False):
+            Input:
+                # User profile
+                name: John  # User's name
+                age: 30
+            
+            Output:
+                age: 30
+                name: John
         """
         try:
-            # First, extract comments from the original text
-            comments = DeterministicYAML._extract_comments(yaml_str)
-            
-            # Parse the YAML data (this will lose comments, but we'll add them back)
+            # Parse the YAML data (this will lose comments)
             data = yaml.safe_load(yaml_str)
             
             if data is None:
                 return 'null'
             
-            # If we have comments, add them to the data structure as $human$ fields
-            if comments:
-                # Ensure root is a dict to hold comments
-                if not isinstance(data, dict):
-                    data = {'_value': data}
+            if preserve_comments:
+                # First, extract comments from the original text
+                comments = DeterministicYAML._extract_comments(yaml_str)
                 
-                # Add comments to the structure
-                data = DeterministicYAML._add_comments_to_structure(data, comments)
+                # If we have comments, add them to the data structure as $human$ fields
+                if comments:
+                    # Ensure root is a dict to hold comments
+                    if not isinstance(data, dict):
+                        data = {'_value': data}
+                    
+                    # Add comments to the structure
+                    data = DeterministicYAML._add_comments_to_structure(data, comments)
+            else:
+                # Strip all $human$ fields for canonical mode
+                data = DeterministicYAML.strip_human(data)
             
             return DeterministicYAML.to_deterministic_yaml(data)
         except Exception as e:
