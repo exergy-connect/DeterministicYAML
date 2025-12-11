@@ -1,4 +1,4 @@
-# Restricted YAML
+# Deterministic YAML
 
 A **deterministic, LLM-friendly subset of YAML** that remains **100% valid YAML**, while eliminating ambiguity, output variance, and syntax hazards.  
 Restricted YAML provides a canonical, predictable serialization format ideal for structured data generation and configuration.
