@@ -445,38 +445,100 @@ name: John
 5. **Simplicity**: Easier to parse, validate, and generate
 6. **Determinism**: Identical output across all platforms and implementations
 
+## 🔧 Converting Existing YAML
+
+**Comment preservation is deterministic, not dependent on LLM behavior.**
+
+### Automatic Conversion
+
+```bash
+# Convert standard YAML to Deterministic YAML
+dyaml convert config.yaml --output config.dyaml
+```
+
+Or using Python:
+
+```python
+from lib.deterministic_yaml import DeterministicYAML
+
+# Read existing YAML file
+with open('config.yaml', 'r') as f:
+    standard_yaml = f.read()
+
+# Convert to Deterministic YAML (preserves comments as $human$ fields)
+deterministic_yaml = DeterministicYAML.normalize(standard_yaml)
+
+# Write output
+with open('config.dyaml', 'w') as f:
+    f.write(deterministic_yaml)
+```
+
+### Canonical Mode (Strip Comments)
+
+For pure data without human annotations:
+
+```python
+# Convert and strip all $human$ fields
+deterministic_yaml = DeterministicYAML.normalize(standard_yaml, preserve_comments=False)
+```
+
+Or strip existing `$human$` fields:
+
+```python
+import yaml
+from lib.deterministic_yaml import DeterministicYAML
+
+# Load YAML with $human$ fields
+data = yaml.safe_load(yaml_str)
+
+# Strip all $human$ fields for canonical mode
+data_only = DeterministicYAML.strip_human(data)
+
+# Generate pure data YAML
+canonical_yaml = DeterministicYAML.to_deterministic_yaml(data_only)
+```
+
 ## Implementation
 
 See `deterministic_yaml.py` for:
 - `to_deterministic_yaml()`: Convert Python data to deterministic YAML
 - `validate()`: Check if YAML conforms to deterministic syntax
-- `normalize()`: Convert any YAML to deterministic format
+- `normalize()`: Convert any YAML to deterministic format (with optional comment preservation)
+- `strip_human()`: Remove all `$human$` fields for canonical mode
 
 See `deterministic_yaml_parser.py` for:
 - Custom parser implementation (optional - standard YAML parsers work too)
 
 ## YAML Compatibility
 
-**Deterministic YAML is fully compatible with standard YAML parsers.**
+**Deterministic YAML is fully compatible with both YAML 1.1 and YAML 1.2 parsers.**
 
-You can use any YAML parser to read Deterministic YAML:
+Deterministic YAML uses only the most basic, common YAML features that work identically in both versions:
+
+- Canonical booleans (`true`, `false`) - supported in both
+- Canonical null (`null`) - supported in both
+- Basic block-style mappings and lists - supported in both
+- Quoted strings - parsed identically in both
+- Standard numeric formats - supported in both
+
+Since Deterministic YAML avoids all version-specific features (no sexagesimal numbers, no merge keys, no ambiguous boolean/null values), it works with any standard YAML parser regardless of version.
 
 ```python
 import yaml
 
-# Deterministic YAML can be parsed by PyYAML
+# Deterministic YAML can be parsed by any YAML parser
 deterministic_yaml = """
 name: John
 age: 30
 active: true
 """
 
-data = yaml.safe_load(deterministic_yaml)  # Works perfectly!
+data = yaml.safe_load(deterministic_yaml)  # Works with YAML 1.1 and 1.2 parsers
 ```
 
 This means:
 - ✅ No special parser required
-- ✅ Works with existing YAML tooling
+- ✅ Works with existing YAML tooling (both 1.1 and 1.2)
 - ✅ Can be used in any YAML-based system
 - ✅ Backward compatible with YAML ecosystem
 

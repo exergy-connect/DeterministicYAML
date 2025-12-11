@@ -134,7 +134,7 @@ AI regenerates → `$human$` preserved → context survives → informed decisio
 
 ## ✅ Features
 
-- Fully valid YAML 1.2  
+- Fully valid YAML (compatible with 1.1 and 1.2)  
 - **Deterministic, canonical subset**
   - Unquoted keys  
   - Unquoted strings unless required  
@@ -249,14 +249,56 @@ tags:
 
 **Comment preservation is deterministic, not dependent on LLM behavior.**
 
-### Automatic Conversion
+### CLI Tool (Recommended)
+
+Install the CLI tool for production use:
+
+```bash
+pip install -e .  # From repository
+# Or: pip install deterministic-yaml  # When published
+```
+
+**Convert files:**
 
 ```bash
 # Convert standard YAML to Deterministic YAML
-dyaml convert config.yaml --output config.dyaml
+dyaml convert config.yaml --output config.d.yaml
+
+# Batch convert
+dyaml convert *.yaml -o configs/
+
+# Replace original with .d.yaml extension
+dyaml convert config.yaml --in-place
 ```
 
-Or using Python:
+**Validate files:**
+
+```bash
+# Validate Deterministic YAML
+dyaml validate config.d.yaml
+
+# JSON output for CI
+dyaml validate --json config.d.yaml
+```
+
+**Other commands:**
+
+```bash
+# Normalize to canonical form
+dyaml normalize config.d.yaml --in-place
+
+# Compare files semantically
+dyaml diff original.d.yaml modified.d.yaml
+
+# Detect semantic drift
+dyaml check-drift config.d.yaml --baseline original.d.yaml
+```
+
+See [CLI Usage Documentation](doc/CLI_USAGE.md) for complete details.
+
+### Python API
+
+Or using Python directly:
 
 ```python
 from lib.deterministic_yaml import DeterministicYAML
@@ -559,7 +601,7 @@ Hash mismatches alert humans to content changes.
 
 **Don't use Deterministic YAML if:**
 
-- You need YAML 1.1 features (some parsers differ on booleans, octals)
+- You need YAML-specific features that Deterministic YAML doesn't support (sexagesimal numbers, merge keys, etc.)
 - You require multi-line string literals (use `\n` escapes instead)
 - You're working with existing YAML that can't be canonicalized
 - Your team isn't willing to enforce the canonical format
@@ -593,7 +635,7 @@ A: Regular comments are metadata that parsers discard. `$human$` fields are firs
 
 **Q: What about YAML 1.1 vs 1.2?**
 
-A: Deterministic YAML targets YAML 1.2. If you need 1.1 compatibility, test carefully with your parser.
+A: Deterministic YAML works with both YAML 1.1 and 1.2 parsers. It uses only basic, common YAML features that are identical in both versions (canonical booleans, null, block-style structures, quoted strings). Since it avoids all version-specific features, compatibility is not an issue.
 
 **Q: Why does the token count example show Deterministic YAML using more tokens than Standard YAML?**
 
