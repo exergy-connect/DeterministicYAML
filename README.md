@@ -5,6 +5,27 @@ Deterministic YAML provides a canonical, predictable serialization format ideal 
 
 ---
 
+## 💭 Fundamental Philosophy: Preserving Human Value
+
+**To comment is human, and human insight must be preserved, not discarded.**
+
+Deterministic YAML is built on the principle that **human value matters**. Comments, documentation, and contextual insights represent valuable human knowledge that should survive all data operations—round-trips, normalization, regeneration, and transformation.
+
+### Comments as Data, Not Metadata
+
+Traditional YAML comments (`#`) are treated as fragile metadata that gets lost, ignored, or rewritten unpredictably. Deterministic YAML treats comments as **first-class data** through `_comment` key-value pairs:
+
+- **Preserved**: Comments survive round-trip parsing, normalization, and regeneration
+- **Deterministic**: Same data always produces same YAML (comments included)
+- **Portable**: Comments are part of the data structure, not metadata that can be discarded
+- **Human insight preserved**: The human touch of comments is maintained, not thrown away
+
+**Comments matter — enough that they need to be handled deterministically, not thrown away.**
+
+When you normalize YAML with comments, they are automatically converted to `_comment` fields, ensuring your documentation and insights remain part of the data structure.
+
+---
+
 ## 🚀 Why Deterministic YAML?
 
 Standard YAML is flexible but inconsistent:
@@ -130,6 +151,7 @@ print(deterministic_yaml)
 
 **Output:**
 ```yaml
+_comment: "name: User's name"
 age: 30
 name: John
 tags:
@@ -137,7 +159,7 @@ tags:
   - ops
 ```
 
-Comments removed, quotes removed (when safe), flow style converted to block style.
+**Note**: Comments are preserved as `_comment` fields (not discarded). Quotes removed (when safe), flow style converted to block style.
 
 ### Deterministic Quoting
 
