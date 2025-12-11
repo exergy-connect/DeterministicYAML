@@ -24,7 +24,12 @@ banana: middle
     banana_pos = output.find('banana:')
     zebra_pos = output.find('zebra:')
     
+    # Ordering implies all keys exist (find returns -1 if not found)
     assert apple_pos < banana_pos < zebra_pos
+    # Verify values are preserved
+    assert 'first' in output
+    assert 'middle' in output
+    assert 'last' in output
 
 
 def test_normalize_positions_human_first():
@@ -38,14 +43,16 @@ age: 30
     deterministic_data = convert_yaml_to_deterministic(data, comments, preserve_comments=True)
     output = to_deterministic_yaml(deterministic_data)
     
-    # $human$ should appear before other keys
+    # $human$ should appear before other keys (which are sorted: age, name)
     human_pos = output.find('$human$:')
-    name_pos = output.find('name:')
     age_pos = output.find('age:')
+    name_pos = output.find('name:')
     
-    if human_pos >= 0:
-        assert human_pos < name_pos
-        assert human_pos < age_pos
+    # Verify $human$ exists and is first (ordering implies age and name exist)
+    assert human_pos >= 0, "$human$ field should be present"
+    assert human_pos < age_pos < name_pos
+    # Verify $human$ value is preserved
+    assert 'User profile' in output
 
 
 def test_normalize_idempotent():

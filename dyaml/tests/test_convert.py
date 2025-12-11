@@ -26,7 +26,7 @@ database:
     output = to_deterministic_yaml(deterministic_data)
     
     assert '$human$' in output
-    assert 'Production config' in output or 'Primary database' in output
+    assert 'Production config' in output and 'Primary database' in output
 
 
 def test_convert_consolidates_multiple_comments():
@@ -43,8 +43,14 @@ service:
     deterministic_data = convert_yaml_to_deterministic(data, comments, preserve_comments=True)
     output = to_deterministic_yaml(deterministic_data)
     
-    # Should have $human$ field with consolidated comments
+    # Should have $human$ field with all comments consolidated
     assert '$human$' in output
+    assert 'Comment 1' in output
+    assert 'Comment 2' in output
+    assert 'Comment 3' in output
+    assert 'Comment 4' in output
+    # Verify they're consolidated with | delimiter (4 comments = 3 delimiters)
+    assert output.count('|') == 3
 
 
 def test_convert_strips_comments_when_requested():
@@ -58,9 +64,12 @@ age: 30
     deterministic_data = convert_yaml_to_deterministic(data, comments, preserve_comments=False)
     output = to_deterministic_yaml(deterministic_data)
     
-    # Should not have $human$ field
+    # Should not have $human$ field or comment text
     assert '$human$' not in output
-    assert 'name: John' in output or 'name: John' in output
+    assert 'Comment' not in output
+    # Should preserve actual data
+    assert 'name: John' in output
+    assert 'age: 30' in output
 
 
 def test_convert_idempotent():
@@ -98,7 +107,13 @@ def test_convert_handles_nested_structures():
     deterministic_data = convert_yaml_to_deterministic(data, comments, preserve_comments=True)
     output = to_deterministic_yaml(deterministic_data)
     
+    # Verify all keys are present
     assert 'database:' in output
     assert 'hosts:' in output
-    assert '- primary' in output or '- primary' in output
+    assert 'config:' in output
+    # Verify list items are present
+    assert '- primary' in output
+    assert '- secondary' in output
+    # Verify nested value
+    assert 'timeout: 30' in output
 

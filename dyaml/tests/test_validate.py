@@ -27,8 +27,9 @@ age: 30
     
     result = validate_string(invalid_yaml)
     assert not result.valid
-    assert len(result.errors) > 0
-    assert any('comment' in e.message.lower() for e in result.errors)
+    # Should have specific error about comments on line 1
+    comment_errors = [e for e in result.errors if 'comment' in e.message.lower()]
+    assert len(comment_errors) > 0 and any(e.line == 1 for e in comment_errors), "Should have comment-related error on line 1"
 
 
 def test_validate_rejects_flow_style():
@@ -37,8 +38,11 @@ def test_validate_rejects_flow_style():
 """
     
     result = validate_string(invalid_yaml)
-    # Note: This might pass if flow style is inside quotes
-    # Full validation would need more sophisticated parsing
+    # Flow style should be rejected
+    assert not result.valid
+    # Should have error about flow style
+    flow_errors = [e for e in result.errors if 'flow' in e.message.lower()]
+    assert len(flow_errors) > 0, "Should have flow style error"
 
 
 def test_validate_checks_indentation():
@@ -49,5 +53,9 @@ age: 30
     
     result = validate_string(invalid_yaml)
     assert not result.valid
-    assert any('tab' in e.message.lower() for e in result.errors)
+    # Should have specific error about tabs
+    tab_errors = [e for e in result.errors if 'tab' in e.message.lower()]
+    assert len(tab_errors) > 0, "Should have tab-related error"
+    # Error should be on line 1 where the tab is
+    assert any(e.line == 1 for e in tab_errors), "Tab error should be on line 1"
 
