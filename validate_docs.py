@@ -2,6 +2,12 @@
 """
 Validate all YAML code blocks in documentation files.
 
+Note: This script validates YAML syntax only. It does NOT verify that
+example outputs match actual function results. For example, if documentation
+shows the output of `normalize()`, this script only checks that the shown
+output is valid Deterministic YAML, not that it matches what `normalize()`
+would actually produce.
+
 Copyright (c) 2025 Exergy ∞ LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -122,6 +128,28 @@ def validate_yaml_block(yaml_content: str, file_path: str, block_line: int) -> T
     # Validate using DeterministicYAML
     is_valid, error = DeterministicYAML.validate(yaml_content)
     return is_valid, error or ""
+
+
+def check_code_examples(file_path: Path, content: str) -> List[Tuple[int, str]]:
+    """
+    Check that code examples showing function output match actual results.
+    
+    NOTE: This is a basic check. Full validation would require:
+    - Parsing Python AST to extract function calls and inputs
+    - Executing the code in a sandbox
+    - Comparing actual vs expected output
+    
+    For now, this is a placeholder for future enhancement.
+    
+    Returns list of (line_number, error_message) tuples.
+    """
+    errors = []
+    # TODO: Implement code example validation
+    # This would check that examples like:
+    #   deterministic_yaml = DeterministicYAML.normalize(standard_yaml)
+    #   print(deterministic_yaml)
+    # Actually produce the shown output
+    return errors
 
 
 def main():
