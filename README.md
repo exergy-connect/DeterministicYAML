@@ -123,7 +123,7 @@ AI regenerates → comment lost → someone changes retries → system breaks
 **After:**
 ```yaml
 service:
-  $human$: Retries limited to 3 due to downstream rate limits (incident #1247)
+  $human$: "Retries limited to 3 due to downstream rate limits (incident #1247)"
   retries: 3
 ```
 AI regenerates → `$human$` preserved → context survives → informed decisions
@@ -402,7 +402,7 @@ The hallucination is syntactically valid but semantically broken. No error is th
 **With `$human$` annotations:**
 ```yaml
 service:
-  $human$: Critical authentication service, handles all login requests
+  $human$: "Critical authentication service, handles all login requests"
   retries: 3
 ```
 
