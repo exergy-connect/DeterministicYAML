@@ -42,9 +42,9 @@ from rich.console import Console
               help='Add CRC32 checksums to $human$ fields (default: False)')
 def normalize(files: tuple, in_place: bool, check: bool, preserve_comments: bool, add_crc32: bool):
     """
-    Normalize Deterministic YAML files to canonical form.
+    Normalize YAML files to canonical Deterministic YAML form.
     
-    Ensures:
+    Works on both regular YAML and Deterministic YAML files. Ensures:
     - Keys are lexicographically sorted
     - $human$ fields are positioned first
     - Consistent formatting and indentation
@@ -54,13 +54,13 @@ def normalize(files: tuple, in_place: bool, check: bool, preserve_comments: bool
     Examples:
     
         # Normalize and output to stdout
-        dyaml normalize config.d.yaml
+        dyaml normalize config.yaml
         
         # Normalize in place
-        dyaml normalize config.d.yaml --in-place
+        dyaml normalize config.yaml --in-place
         
         # Check if normalized (useful for CI)
-        dyaml normalize --check config.d.yaml
+        dyaml normalize --check config.yaml
     """
     console = Console()
     file_paths = [Path(f) for f in files]

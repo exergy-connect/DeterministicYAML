@@ -292,10 +292,10 @@ dyaml validate --no-validate-crc32 config.d.yaml
 
 ```bash
 # Normalize to canonical form
-dyaml normalize config.d.yaml --in-place
+dyaml normalize config.yaml --in-place
 
 # Normalize and add CRC32 checksums
-dyaml normalize config.d.yaml --in-place --add-crc32
+dyaml normalize config.yaml --in-place --add-crc32
 
 # Compare files semantically
 dyaml diff original.d.yaml modified.d.yaml

@@ -113,21 +113,22 @@ dyaml validate --json config.d.yaml
 }
 ```
 
-### `dyaml normalize` - Canonicalize Deterministic YAML
+### `dyaml normalize` - Canonicalize YAML
 
-Normalize files to canonical form (idempotent operation).
+Normalize YAML files to canonical Deterministic YAML form (idempotent operation).
+Works on both regular YAML and Deterministic YAML files.
 
 **Usage:**
 
 ```bash
 # Normalize and output to stdout
-dyaml normalize config.d.yaml
+dyaml normalize config.yaml
 
 # Normalize in place
-dyaml normalize config.d.yaml --in-place
+dyaml normalize config.yaml --in-place
 
 # Check if normalized (useful for CI)
-dyaml normalize --check config.d.yaml
+dyaml normalize --check config.yaml
 ```
 
 **Options:**
@@ -232,7 +233,7 @@ jobs:
           python-version: '3.11'
       - run: pip install deterministic-yaml
       - run: dyaml validate configs/*.d.yaml
-      - run: dyaml normalize --check configs/*.d.yaml
+      - run: dyaml normalize --check configs/*.yaml
 ```
 
 ### Pre-commit Hook
@@ -248,13 +249,14 @@ repos:
         name: Validate Deterministic YAML
         entry: dyaml validate
         language: python
-        files: \.d\.yaml$
+        files: '\.d\.yaml$'
       
       - id: dyaml-normalize
         name: Normalize Deterministic YAML
         entry: dyaml normalize --check
         language: python
-        files: \.d\.yaml$
+        files: '\.yaml$'
+        exclude: '\.d\.yaml$'
 ```
 
 ### Exit Codes for CI
