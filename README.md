@@ -147,6 +147,7 @@ AI regenerates → `$human$` preserved → context survives → informed decisio
   - Mandatory 2-space indentation  
   - Mandatory lexicographic key ordering  
   - Canonical empty collections: `[]` and `{}`  
+- **Optional CRC32 checksums** for `$human$` field integrity (automatic drift detection)
 - Low variance for LLM output (~70–90% reduction vs standard YAML)  
 - Token-efficient (~20–30% fewer tokens than JSON)  
 - Easy to generate and validate
@@ -269,16 +270,22 @@ dyaml convert *.yaml -o configs/
 
 # Replace original with .d.yaml extension
 dyaml convert config.yaml --in-place
+
+# Add CRC32 checksums to $human$ fields (for drift detection)
+dyaml convert config.yaml --add-crc32 -o config.d.yaml
 ```
 
 **Validate files:**
 
 ```bash
-# Validate Deterministic YAML
+# Validate Deterministic YAML (CRC32 checksums validated automatically if present)
 dyaml validate config.d.yaml
 
 # JSON output for CI
 dyaml validate --json config.d.yaml
+
+# Skip CRC32 validation
+dyaml validate --no-validate-crc32 config.d.yaml
 ```
 
 **Other commands:**
@@ -286,6 +293,9 @@ dyaml validate --json config.d.yaml
 ```bash
 # Normalize to canonical form
 dyaml normalize config.d.yaml --in-place
+
+# Normalize and add CRC32 checksums
+dyaml normalize config.d.yaml --in-place --add-crc32
 
 # Compare files semantically
 dyaml diff original.d.yaml modified.d.yaml
@@ -314,6 +324,27 @@ deterministic_yaml = DeterministicYAML.normalize(standard_yaml)
 with open('config.dyaml', 'w') as f:
     f.write(deterministic_yaml)
 ```
+
+### CRC32 Checksums for Drift Detection
+
+Protect `$human$` fields against unintentional modification with optional CRC32 checksums:
+
+```bash
+# Add CRC32 checksums when converting
+dyaml convert config.yaml --add-crc32 -o config.d.yaml
+
+# CRC32 validation happens automatically when present
+dyaml validate config.d.yaml  # Validates CRC32 if markers are found
+```
+
+**Example with CRC32:**
+
+```yaml
+$human$: "Critical: Keep retries at 3 due to rate limits[crc32:3kH6xA==]"
+retries: 3
+```
+
+If the `$human$` content is modified, validation will detect the mismatch.
 
 ### Canonical Mode (Strip Comments)
 
