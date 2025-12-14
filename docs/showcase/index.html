@@ -93,13 +93,23 @@
             border-color: #28a745;
         }
 
+        .yaml-wrapper.json {
+            border-color: #0066cc;
+        }
+
         .yaml-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 15px;
             margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 2px solid #e0e0e0;
+        }
+
+        .yaml-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .title-group {
@@ -124,35 +134,127 @@
             color: #28a745;
         }
 
+        .yaml-wrapper.json .yaml-type-title {
+            color: #0066cc;
+        }
+
         .button-group {
             display: flex;
             gap: 10px;
             align-items: center;
         }
 
-        .flip-button {
-            background: #666;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 14px;
+        .format-slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            min-width: 300px;
+            margin: 0 auto;
+        }
+
+        .yaml-header-center {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 11px;
             font-weight: 600;
+            color: #666;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+
+        .slider-label-left {
+            text-align: left;
+        }
+
+        .slider-label-right {
+            text-align: right;
+        }
+
+        .format-slider {
+            position: relative;
+            width: 100%;
+            height: 40px;
+            background: #e0e0e0;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
             cursor: pointer;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .slider-track {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 4px;
+        }
+
+        .slider-option {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease, font-weight 0.3s ease;
+            z-index: 2;
+            position: relative;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .slider-thumb {
+            position: absolute;
+            width: calc(33.333% - 8px);
+            height: 32px;
+            background: #0066cc;
+            border-radius: 16px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 15px rgba(0, 102, 204, 0.6), 0 0 30px rgba(0, 102, 204, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1;
         }
 
-        .flip-button:hover {
-            background: #555;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        .format-slider.regular .slider-thumb {
+            left: 4px;
         }
 
-        .flip-button:active {
-            transform: translateY(0);
+        .format-slider.deterministic .slider-thumb {
+            left: calc(33.333% + 4px);
+        }
+
+        .format-slider.json .slider-thumb {
+            left: calc(66.666% + 4px);
+        }
+
+        .format-slider.regular .slider-option:nth-child(2),
+        .format-slider.deterministic .slider-option:nth-child(3),
+        .format-slider.json .slider-option:nth-child(4) {
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(0, 102, 204, 0.6);
+            font-weight: 700;
+        }
+
+        .format-slider.regular .slider-option:nth-child(3),
+        .format-slider.regular .slider-option:nth-child(4),
+        .format-slider.deterministic .slider-option:nth-child(2),
+        .format-slider.deterministic .slider-option:nth-child(4),
+        .format-slider.json .slider-option:nth-child(2),
+        .format-slider.json .slider-option:nth-child(3) {
+            color: #999;
         }
 
         .prompt-button {
@@ -517,7 +619,10 @@
                 gap: 8px;
             }
 
-            .flip-button,
+            .format-slider-container {
+                min-width: 100%;
+            }
+
             .prompt-button,
             .llm-response-button {
                 width: 100%;
@@ -529,20 +634,35 @@
     <div class="slide-container">
         <div class="slide">
             <div class="slide-header">
-                <h1 class="slide-title">YAML vs Deterministic YAML</h1>
+                <h1 class="slide-title">YAML vs Deterministic YAML vs JSON</h1>
                 <div class="slide-subtitle">Compare how LLMs handle combining patient healthcare records into a list</div>
             </div>
 
             <div class="slide-content">
                 <div class="yaml-wrapper regular" id="yaml-wrapper">
                     <div class="yaml-header">
-                        <div class="title-group">
-                            <h2 class="yaml-type-title" id="yaml-type-title">Regular YAML</h2>
-                            <button class="flip-button" onclick="flipYAML()" title="Switch between Regular and Deterministic YAML">Flip</button>
+                        <div class="yaml-header-top">
+                            <div class="title-group">
+                                <h2 class="yaml-type-title" id="yaml-type-title">Regular YAML</h2>
+                            </div>
+                            <div class="button-group">
+                                <button class="prompt-button" onclick="copyPrompt(this)" title="Copy prompt with current YAML sample">Prompt</button>
+                                <button class="llm-response-button" onclick="showLLMResponse()" title="Show sample LLM response">Show sample LLM response</button>
+                            </div>
                         </div>
-                        <div class="button-group">
-                            <button class="prompt-button" onclick="copyPrompt(this)" title="Copy prompt with current YAML sample">Prompt</button>
-                            <button class="llm-response-button" onclick="showLLMResponse()" title="Show sample LLM response">Show sample LLM response</button>
+                        <div class="yaml-header-center">
+                            <div class="format-slider-container">
+                                <div class="slider-labels">
+                                    <div class="slider-label-left">human friendly<br>ambiguous</div>
+                                    <div class="slider-label-right">deterministic<br>strict</div>
+                                </div>
+                                <div class="format-slider regular" id="format-slider" onclick="handleSliderClick(event)">
+                                    <div class="slider-thumb"></div>
+                                    <div class="slider-option">YAML</div>
+                                    <div class="slider-option">Deterministic<br>YAML</div>
+                                    <div class="slider-option">JSON</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="yaml-container">
@@ -614,26 +734,78 @@ patient_002:
   discharge_date: 2025-12-10
   medication: ibuprofen
   patient_id: P-2025-002
-  temperature: 98.6`
+  temperature: 98.6`,
+            json: `{
+  "patient_001": {
+    "patient_id": "P-2025-001",
+    "age": 72,
+    "condition": "diabetes type 2",
+    "medication": "metformin 500mg twice daily",
+    "last_glucose": 125,
+    "notes": "Elderly patient with diabetes - blood sugar levels stable, continue monitoring"
+  },
+  "patient_002": {
+    "patient_id": "P-2025-002",
+    "age": 8,
+    "condition": "viral infection",
+    "medication": "ibuprofen",
+    "temperature": 98.6,
+    "discharge_date": "2025-12-10",
+    "notes": "Pediatric case - fever resolved, parents informed of discharge plan. Medication: switched from acetaminophen - better response observed, no adverse reactions"
+  }
+}`
         };
 
         let currentType = 'regular';
 
-        function flipYAML() {
-            // Toggle between regular and deterministic
-            currentType = currentType === 'regular' ? 'deterministic' : 'regular';
+        function handleSliderClick(event) {
+            const slider = document.getElementById('format-slider');
+            const rect = slider.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const width = rect.width;
             
+            // Determine which third was clicked
+            if (clickX < width / 3) {
+                currentType = 'regular';
+            } else if (clickX < (width * 2) / 3) {
+                currentType = 'deterministic';
+            } else {
+                currentType = 'json';
+            }
+            
+            updateDisplay();
+        }
+
+        function updateDisplay() {
             // Update wrapper class
             const wrapper = document.getElementById('yaml-wrapper');
             wrapper.className = `yaml-wrapper ${currentType}`;
             
+            // Update slider class
+            const slider = document.getElementById('format-slider');
+            slider.className = `format-slider ${currentType}`;
+            
             // Update title
             const title = document.getElementById('yaml-type-title');
-            title.textContent = currentType === 'regular' ? 'Regular YAML' : 'Deterministic YAML';
+            if (currentType === 'regular') {
+                title.textContent = 'Regular YAML';
+            } else if (currentType === 'deterministic') {
+                title.textContent = 'Deterministic YAML';
+            } else {
+                title.textContent = 'JSON';
+            }
             
             // Update code content
             const code = document.getElementById('yaml-code');
             code.textContent = yamlContent[currentType];
+            
+            // Update label
+            const label = document.querySelector('.yaml-label');
+            if (currentType === 'json') {
+                label.textContent = 'JSON Sample:';
+            } else {
+                label.textContent = 'YAML Sample:';
+            }
         }
 
         function copyPrompt(button) {
@@ -718,6 +890,29 @@ patients:
       medication: ibuprofen
       patient_id: P-2025-002
       temperature: 98.6
+\`\`\``,
+            json: `Here's the combined list in JSON format:
+
+\`\`\`json
+[
+  {
+    "patient_id": "P-2025-001",
+    "age": 72,
+    "condition": "diabetes type 2",
+    "medication": "metformin 500mg twice daily",
+    "last_glucose": 125,
+    "notes": "Elderly patient with diabetes - blood sugar levels stable, continue monitoring"
+  },
+  {
+    "patient_id": "P-2025-002",
+    "age": 8,
+    "condition": "viral infection",
+    "medication": "ibuprofen",
+    "temperature": 98.6,
+    "discharge_date": "2025-12-10",
+    "notes": "Pediatric case - fever resolved, parents informed of discharge plan. Medication: switched from acetaminophen - better response observed, no adverse reactions"
+  }
+]
 \`\`\``
         };
 
@@ -734,8 +929,8 @@ patients:
             htmlContent += '<div class="prompt-text">' + escapeHtml(mainPrompt) + '</div>';
             htmlContent += '</div>';
             
-            // Split by code blocks
-            const parts = response.split(/```yaml\n([\s\S]*?)```/);
+            // Split by code blocks (yaml or json)
+            const parts = response.split(/```(?:yaml|json)\n([\s\S]*?)```/);
             
             for (let i = 0; i < parts.length; i++) {
                 if (i % 2 === 0) {
